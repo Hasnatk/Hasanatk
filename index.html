@@ -350,7 +350,7 @@
             if(type === 'reg') {
                 const res = await createUserWithEmailAndPassword(auth, email, p);
                 const initialData = {
-                    u: u, pts: 0, strk: 0, last: "",
+                    u: u, pts: 0, strk: 1, last: "",
                     dailyTasks: {},
                     history: { prayers: 0, quran: 0, taraweeh: 0, hadith: 0 },
                     lastDayChecked: new Date().toDateString()
@@ -637,4 +637,5 @@
 </script>
 </body>
 </html>
+
 
