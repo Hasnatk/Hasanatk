@@ -314,7 +314,7 @@
     let currentUserData = null;
     let allSurahs = [];
     let misbahaCount = 0;
-    let logicLock = false; // قفل لمنع العمليات المتكررة
+    let logicLock = false;
 
     const setLoaderProgress = (p) => document.getElementById('loaderFill').style.width = p + "%";
     const showLoader = () => { 
@@ -352,9 +352,10 @@
                 const res = await createUserWithEmailAndPassword(auth, email, p);
                 const initialData = {
                     u: u, pts: 0, strk: 1, 
-                    last: new Date().toDateString(), // حل مشكلة زيادة الستريك عند أول دخول
+                    last: new Date().toDateString(),
                     dailyTasks: {},
                     history: { prayers: 0, quran: 0, taraweeh: 0, hadith: 0 },
+                    surahHistory: {}, // نظام تتبع السور
                     lastDayChecked: new Date().toDateString()
                 };
                 await setDoc(doc(db, "users", res.user.uid), initialData);
@@ -450,7 +451,7 @@
 
     window.addTaskOnce = async (id, pts, e) => {
         if(e) e.stopPropagation();
-        if(logicLock) return; // منع التكرار عند النقر المتعدد
+        if(logicLock) return;
         if(currentUserData.dailyTasks[id]) return;
         
         logicLock = true;
@@ -534,8 +535,51 @@
                     <button class="btn-nav" onclick="document.getElementById('surahContentPage').scrollTo(0,0)">للأعلى</button>
                     ${num>1?`<button class="btn-nav" onclick="loadSurah(${num-1})">السابقة</button>`:''}
                 </div>`;
-            document.getElementById('finishSurahBtn').onclick = () => { logAction('quran', 20); alert("تم إضافة 20 نقطة"); };
+            
+            // نظام التحقق من 30 يوماً
+            const lastRead = currentUserData.surahHistory ? currentUserData.surahHistory[num] : null;
+            const btn = document.getElementById('finishSurahBtn');
+            const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+
+            if (lastRead && (Date.now() - lastRead < thirtyDays)) {
+                const daysLeft = Math.ceil((thirtyDays - (Date.now() - lastRead)) / (1000 * 60 * 60 * 24));
+                btn.innerText = `متاح بعد ${daysLeft} يوم`;
+                btn.disabled = true;
+                btn.style.background = "#555";
+            } else {
+                btn.innerText = "أتممت القراءة +20";
+                btn.disabled = false;
+                btn.style.background = "var(--gold)";
+                btn.onclick = () => finishSurahAction(num);
+            }
         } catch(e) { alert("خطأ في التحميل"); }
+    };
+
+    window.finishSurahAction = async (surahNum) => {
+        if (logicLock) return;
+        logicLock = true;
+        try {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            const now = Date.now();
+            
+            await updateDoc(userRef, {
+                pts: increment(20),
+                [`surahHistory.${surahNum}`]: now,
+                [`history.quran`]: increment(1)
+            });
+
+            if (!currentUserData.surahHistory) currentUserData.surahHistory = {};
+            currentUserData.surahHistory[surahNum] = now;
+            currentUserData.pts += 20;
+            
+            refresh();
+            alert("تم إضافة 20 نقطة بنجاح!");
+            loadSurah(surahNum);
+        } catch (e) {
+            alert("حدث خطأ أثناء حفظ البيانات");
+        } finally {
+            logicLock = false;
+        }
     };
 
     window.openMisbaha = () => openSubPage('misbahaPage');
@@ -627,18 +671,19 @@
     };
 
     window.resetAll = async () => {
-        if(confirm("هل أنت متأكد من تصفير إنجازاتك بالكامل؟")) {
+        if(confirm("هل أنت متأكد من تصفير إنجازاتك بالكامل؟ سيتم مسح سجل السور أيضاً.")) {
             const resetData = { 
                 pts: 0, 
                 strk: 1, 
-                last: new Date().toDateString(), // لضمان عدم حدوث تكرار الستريك بعد التصفير أيضاً
+                last: new Date().toDateString(),
                 dailyTasks: {}, 
-                history: {prayers:0, quran:0, taraweeh:0, hadith:0} 
+                history: {prayers:0, quran:0, taraweeh:0, hadith:0},
+                surahHistory: {} // مسح تاريخ قراءة السور
             };
             await updateDoc(doc(db, "users", auth.currentUser.uid), resetData);
             currentUserData = {...currentUserData, ...resetData};
             refresh(); loadPrayersUI();
-            alert("تم التصفير بنجاح");
+            alert("تم التصفير بنجاح، يمكنك الآن أخذ نقاط السور مرة أخرى.");
         }
     };
 
