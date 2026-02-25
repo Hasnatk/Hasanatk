@@ -618,7 +618,7 @@
 
     window.resetAll = async () => {
         if(confirm("هل أنت متأكد من تصفير إنجازاتك بالكامل؟")) {
-            const resetData = { pts: 0, strk: 0, dailyTasks: {}, history: {prayers:0, quran:0, taraweeh:0, hadith:0} };
+            const resetData = { pts: 0, strk: 1, dailyTasks: {}, history: {prayers:0, quran:0, taraweeh:0, hadith:0} };
             await updateDoc(doc(db, "users", auth.currentUser.uid), resetData);
             currentUserData = {...currentUserData, ...resetData};
             refresh(); loadPrayersUI();
@@ -637,5 +637,6 @@
 </script>
 </body>
 </html>
+
 
 
