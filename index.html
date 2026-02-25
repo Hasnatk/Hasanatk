@@ -107,11 +107,11 @@
         .surah-item { 
             background: var(--card); border: 1px solid var(--border); padding: 20px 10px; border-radius: 15px; 
             text-align: center; font-weight: 700; color: var(--gold); cursor: pointer; transition: 0.3s; 
-            font-size: 1.4rem; font-family: 'Amiri', serif;
+            font-size: 1.4rem; font-family: 'Amiri';
         }
 
-        #surahBody { line-height: 2.8; font-size: 1.9rem; padding: 30px 20px 40px; font-family: 'Amiri', serif; text-align: center; color: var(--text); }
-        .basmala { font-size: 2.4rem; color: var(--gold); margin: 0 0 40px; font-family: 'Amiri', serif; display: block; }
+        #surahBody { line-height: 2.8; font-size: 1.9rem; padding: 30px 20px 40px; font-family: 'Amiri'; text-align: center; color: var(--text); }
+        .basmala { font-size: 2.4rem; color: var(--gold); margin: 0 0 40px; font-family: 'Amiri'; display: block; }
         .ayah-num { color: var(--gold); font-size: 1.2rem; margin: 0 5px; font-family: 'Cairo'; font-weight: 400; }
         
         .reward-box { padding: 40px 20px; text-align: center; background: var(--card); border-top: 1px solid var(--border); }
@@ -304,7 +304,7 @@
         "«الدِّينُ النَّصِيحَةُ»",
         "«بُنِيَ الإِسْلامُ عَلَى خَمْسٍ...»",
         "«مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ»",
-        "«إِنَّ اللَّهَ رَفِيقٌ يُحِبُ core_model الرِّفْقَ فِي الأَمْرِ كُلِّهِ»",
+        "«إِنَّ اللَّهَ رَفِيقٌ يُحِبُ الرِّفْقَ فِي الأَمْرِ كُلِّهِ»",
         "«تَبَسُّمُكَ فِي وَجْهِ أَخِيكَ صَدَقَةٌ»",
         "«الطهور شطر الإيمان»",
         "«احفظ الله يحفظك»",
@@ -314,6 +314,7 @@
     let currentUserData = null;
     let allSurahs = [];
     let misbahaCount = 0;
+    let logicLock = false; // قفل لمنع العمليات المتكررة
 
     const setLoaderProgress = (p) => document.getElementById('loaderFill').style.width = p + "%";
     const showLoader = () => { 
@@ -350,7 +351,8 @@
             if(type === 'reg') {
                 const res = await createUserWithEmailAndPassword(auth, email, p);
                 const initialData = {
-                    u: u, pts: 0, strk: 1, last: "",
+                    u: u, pts: 0, strk: 1, 
+                    last: new Date().toDateString(), // حل مشكلة زيادة الستريك عند أول دخول
                     dailyTasks: {},
                     history: { prayers: 0, quran: 0, taraweeh: 0, hadith: 0 },
                     lastDayChecked: new Date().toDateString()
@@ -448,14 +450,22 @@
 
     window.addTaskOnce = async (id, pts, e) => {
         if(e) e.stopPropagation();
+        if(logicLock) return; // منع التكرار عند النقر المتعدد
         if(currentUserData.dailyTasks[id]) return;
         
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        await updateDoc(userRef, { [`dailyTasks.${id}`]: true });
-        
-        currentUserData.dailyTasks[id] = true;
-        await logAction(id.startsWith('p') ? 'prayers' : id, pts);
-        if(id.startsWith('p')) loadPrayersUI();
+        logicLock = true;
+        try {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            await updateDoc(userRef, { [`dailyTasks.${id}`]: true });
+            
+            currentUserData.dailyTasks[id] = true;
+            await logAction(id.startsWith('p') ? 'prayers' : id, pts);
+            if(id.startsWith('p')) loadPrayersUI();
+        } catch(err) {
+            console.error(err);
+        } finally {
+            logicLock = false;
+        }
     };
 
     window.checkDayReset = async () => {
@@ -618,7 +628,13 @@
 
     window.resetAll = async () => {
         if(confirm("هل أنت متأكد من تصفير إنجازاتك بالكامل؟")) {
-            const resetData = { pts: 0, strk: 1, dailyTasks: {}, history: {prayers:0, quran:0, taraweeh:0, hadith:0} };
+            const resetData = { 
+                pts: 0, 
+                strk: 1, 
+                last: new Date().toDateString(), // لضمان عدم حدوث تكرار الستريك بعد التصفير أيضاً
+                dailyTasks: {}, 
+                history: {prayers:0, quran:0, taraweeh:0, hadith:0} 
+            };
             await updateDoc(doc(db, "users", auth.currentUser.uid), resetData);
             currentUserData = {...currentUserData, ...resetData};
             refresh(); loadPrayersUI();
@@ -637,6 +653,3 @@
 </script>
 </body>
 </html>
-
-
-
