@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حسناتك اليومية 2026 - النسخة المحدثة</title>
+    <title>حسناتك</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -34,18 +34,20 @@
             transition: 0.3s ease;
         }
 
-        /* Loading Spinner */
+        /* Professional Loading Screen */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 5000;
+            background: var(--bg); z-index: 5000;
             display: flex; align-items: center; justify-content: center; flex-direction: column;
+            transition: opacity 0.5s ease;
         }
-        .spinner {
-            width: 50px; height: 50px; border: 5px solid #333;
-            border-top: 5px solid var(--gold); border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loader-content { text-align: center; width: 80%; max-width: 300px; }
+        .loader-logo { font-size: 2.5rem; font-weight: 700; color: var(--gold); margin-bottom: 20px; font-family: 'Cairo'; }
+        .progress-container { width: 100%; height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 15px; }
+        .progress-fill-loader { height: 100%; width: 0%; background: var(--gold); transition: width 0.4s ease; }
+        .loading-text { color: var(--text); font-size: 1rem; }
+        .dots::after { content: ''; animation: dotsAnim 1.5s infinite; }
+        @keyframes dotsAnim { 0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; } }
 
         .menu-btn { position: fixed; top: 20px; left: 20px; font-size: 1.8rem; color: var(--gold); cursor: pointer; z-index: 2001; display: none; }
         .sidebar { position: fixed; top: 0; left: -280px; width: 260px; height: 100%; background: var(--card); transition: 0.3s; z-index: 2000; padding-top: 70px; border-right: 1px solid var(--border); }
@@ -81,12 +83,11 @@
         .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold), #f0d58e); transition: 1s ease-in-out; }
         
         .tasks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px 20px 30px; }
-        .task-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 10px; cursor: pointer; transition: 0.3s; position: relative; }
+        .task-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 10px; cursor: pointer; transition: 0.3s; position: relative; min-height: 160px; }
         .task-card:active { transform: scale(0.95); }
         .task-card i { font-size: 1.8rem; color: var(--gold); background: var(--gold-soft); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 18px; margin-bottom: 12px; }
-        .task-card h3 { font-size: 1rem; margin: 0 0 10px 0; font-weight: 600; }
+        .task-card h3 { font-size: 1rem; margin: 0 0 10px 0; font-weight: 600; text-align: center; }
         .task-card.completed-task { border-color: var(--gold); opacity: 0.8; }
-        .hadith-card { grid-column: 1 / span 2; width: 80%; margin: 10px auto; }
         
         .btn-action { background: var(--gold); color: #000; border: none; padding: 8px 18px; border-radius: 10px; font-weight: bold; cursor: pointer; font-family: 'Cairo'; font-size: 0.9rem; }
         .btn-action:disabled { background: #555 !important; cursor: not-allowed; color: #ccc; }
@@ -123,16 +124,26 @@
         .toggle-pass { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--gold); cursor: pointer; z-index: 10; }
         .hidden { display: none; }
         
-        .zekr-box { background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 20px; margin-bottom: 10px; cursor: pointer; position: relative; }
-        .zekr-count { position: absolute; top: 10px; left: 10px; background: var(--gold); color: #000; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; }
-        .completed { opacity: 0.5; border-color: var(--gold); }
         .nav-controls { display: flex; justify-content: space-around; padding: 20px; gap: 10px; background: var(--card); border-top: 1px solid var(--border); }
         .btn-nav { background: var(--bg); color: var(--gold); border: 1px solid var(--gold); padding: 10px; border-radius: 10px; cursor: pointer; font-family: 'Cairo'; flex: 1; font-weight: bold; }
+
+        /* Misbaha Specific */
+        .misbaha-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        #misbahaCounter { font-size: 5rem; color: var(--gold); font-weight: 700; margin-bottom: 20px; }
+        .misbaha-btn { width: 220px; height: 220px; border-radius: 50%; background: var(--card); border: 8px solid var(--gold); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 20px var(--gold-soft); transition: 0.1s; -webkit-tap-highlight-color: transparent; }
+        .misbaha-btn:active { transform: scale(0.95); background: var(--gold-soft); }
+        .misbaha-btn i { font-size: 4rem; color: var(--gold); }
     </style>
 </head>
 <body>
 
-<div id="loader"><div class="spinner"></div><p style="color:var(--gold); margin-top:15px;">جاري المعالجة...</p></div>
+<div id="loader">
+    <div class="loader-content">
+        <div class="loader-logo">Hasanatk</div>
+        <div class="progress-container"><div class="progress-fill-loader" id="loaderFill"></div></div>
+        <div class="loading-text">جاري التحميل<span class="dots"></span></div>
+    </div>
+</div>
 
 <div class="menu-btn" id="hamburger"><i class="fas fa-bars"></i></div>
 
@@ -143,6 +154,7 @@
 <div class="sidebar" id="sidebar">
     <div class="sidebar-link" onclick="openStats(); toggleSidebar();"><i class="fas fa-chart-pie"></i> الإحصائيات</div>
     <div class="sidebar-link" onclick="openLeaderboard(); toggleSidebar();"><i class="fas fa-trophy"></i> لوحة الصدارة</div>
+    <div class="sidebar-link" onclick="openMisbaha(); toggleSidebar();"><i class="fas fa-fingerprint"></i> المسبحة الإلكترونية</div>
     <div class="sidebar-link" onclick="toggleTheme()"><i class="fas fa-circle-half-stroke"></i> <span id="themeText">الوضع الفاتح</span></div>
     <div class="sidebar-link" onclick="resetAll()"><i class="fas fa-redo"></i> تصفير الإنجازات</div>
     <div class="sidebar-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</div>
@@ -161,7 +173,7 @@
 
 <div id="mainPage" class="hidden">
     <header>
-        <h1>حسناتك اليومية</h1>
+        <h1>Hasanatk</h1>
         <div id="countdown">تحميل العداد...</div>
     </header>
     
@@ -191,13 +203,9 @@
         </div>
         <div class="task-card" onclick="openQuranIndex()">
             <i class="fas fa-book-quran"></i>
-            <h3>ورد القرآن</h3>
+            <h3>القرآن</h3>
         </div>
-        <div class="task-card" onclick="openSubPage('azkarPage')">
-            <i class="fas fa-comment-dots"></i>
-            <h3>الأذكار</h3>
-        </div>
-        <div class="task-card hadith-card" id="hadithCardMain" onclick="openHadith()">
+        <div class="task-card" id="hadithCardMain" onclick="openHadith()">
             <i class="fas fa-scroll"></i>
             <h3 id="hadithTitle">حديث اليوم</h3>
         </div>
@@ -227,6 +235,20 @@
     </div>
 </div>
 
+<div id="misbahaPage" class="sub-page">
+    <div class="sub-header">
+        <i class="fas fa-arrow-right" onclick="closeSubPage('misbahaPage')"></i> 
+        <span>المسبحة الإلكترونية</span>
+    </div>
+    <div class="misbaha-container">
+        <div id="misbahaCounter">0</div>
+        <div class="misbaha-btn" onclick="countMisbaha()">
+            <i class="fas fa-fingerprint"></i>
+        </div>
+        <button class="btn-action" onclick="resetMisbaha()" style="margin-top: 40px; background: transparent; border: 1px solid #ff4444; color: #ff4444;">تصفير العداد</button>
+    </div>
+</div>
+
 <div id="statsPage" class="sub-page">
     <div class="sub-header"><i class="fas fa-arrow-right" onclick="closeSubPage('statsPage')"></i> <span>إحصائياتي</span></div>
     <div class="stats-container" id="statsGrid"></div>
@@ -238,12 +260,6 @@
         <h3 style="color:var(--gold);">سجل صلواتك</h3>
         <div id="prayerList"></div>
     </div>
-</div>
-
-<div id="azkarPage" class="sub-page">
-    <div class="sub-header"><i class="fas fa-arrow-right" onclick="closeSubPage('azkarPage')"></i> <span>الأذكار</span></div>
-    <div id="categoriesGrid" style="display:grid; gap:12px; padding:20px;"></div>
-    <div id="tasbeehContent" style="padding: 20px;"></div>
 </div>
 
 <div id="hadithModal" class="modal">
@@ -278,20 +294,40 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const azkarData = {
-        'الصباح': {icon: 'fa-sun', data: [{t: "أصبحنا وأصبح الملك لله", c: 1}, {t: "سبحان الله وبحمده", c: 100}]},
-        'المساء': {icon: 'fa-moon', data: [{t: "أمسينا وأمسى الملك لله", c: 1}, {t: "اللهم بك أمسينا", c: 1}]},
-        'الاستيقاظ': {icon: 'fa-bell', data: [{t: "الحمد لله الذي أحيانا بعد ما أماتنا وإليه النشور", c: 1}]},
-        'بعد الصلاة': {icon: 'fa-mosque', data: [{t: "أستغفر الله", c: 3}, {t: "سبحان الله", c: 33}, {t: "الحمد لله", c: 33}, {t: "الله أكبر", c: 33}]},
-        'النوم': {icon: 'fa-bed', data: [{t: "باسمك اللهم أموت وأحيا", c: 1}]}
-    };
-    const hadiths = ["«إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ»", "«خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ»", "«كَلِمَتَانِ خَفِيفَتَانِ عَلَى اللِّسَانِ، ثَقِيلَتَانِ فِي الْمِيزَانِ: سُبْحَانَ اللهِ وَبِحَمْدِهِ، سُبْحَانَ اللهِ الْعَظِيمِ»"];
+    const hadiths = [
+        "«إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ»", 
+        "«خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ»", 
+        "«كَلِمَتَانِ خَفِيفَتَانِ عَلَى اللِّسَانِ، ثَقِيلَتَانِ فِي الْمِيزَانِ: سُبْحَانَ اللهِ وَبِحَمْدِهِ، سُبْحَانَ اللهِ الْعَظِيمِ»",
+        "«لا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ»",
+        "«مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ»",
+        "«اتَّقِ اللَّهَ حَيْثُمَا كُنْتَ، وَأَتْبِعِ السَّيِّئَةَ الْحَسَنَةَ تَمْحُهَا»",
+        "«الدِّينُ النَّصِيحَةُ»",
+        "«بُنِيَ الإِسْلامُ عَلَى خَمْسٍ...»",
+        "«مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ»",
+        "«إِنَّ اللَّهَ رَفِيقٌ يُحِبُ core_model الرِّفْقَ فِي الأَمْرِ كُلِّهِ»",
+        "«تَبَسُّمُكَ فِي وَجْهِ أَخِيكَ صَدَقَةٌ»",
+        "«الطهور شطر الإيمان»",
+        "«احفظ الله يحفظك»",
+        "«لا تغضب»"
+    ];
 
     let currentUserData = null;
     let allSurahs = [];
+    let misbahaCount = 0;
 
-    const showLoader = () => document.getElementById('loader').style.display = 'flex';
-    const hideLoader = () => document.getElementById('loader').style.display = 'none';
+    const setLoaderProgress = (p) => document.getElementById('loaderFill').style.width = p + "%";
+    const showLoader = () => { 
+        document.getElementById('loader').style.display = 'flex'; 
+        document.getElementById('loader').style.opacity = '1';
+        setLoaderProgress(10);
+    };
+    const hideLoader = () => {
+        setLoaderProgress(100);
+        setTimeout(() => {
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+        }, 300);
+    };
 
     window.togglePassword = () => {
         const pass = document.getElementById('pass');
@@ -309,7 +345,6 @@
         if(!u || !p) return alert("أكمل البيانات");
         const email = u.replace(/\s+/g, '') + "@hasanat.com";
 
-        showLoader();
         try {
             await setPersistence(auth, browserLocalPersistence);
             if(type === 'reg') {
@@ -317,7 +352,7 @@
                 const initialData = {
                     u: u, pts: 0, strk: 0, last: "",
                     dailyTasks: {},
-                    history: { prayers: 0, azkar: 0, quran: 0, taraweeh: 0, hadith: 0 },
+                    history: { prayers: 0, quran: 0, taraweeh: 0, hadith: 0 },
                     lastDayChecked: new Date().toDateString()
                 };
                 await setDoc(doc(db, "users", res.user.uid), initialData);
@@ -327,19 +362,23 @@
             }
         } catch (e) {
             alert("خطأ: " + e.message);
-        } finally { hideLoader(); }
+        }
     };
 
     onAuthStateChanged(auth, async (user) => {
         const hBtn = document.getElementById('hamburger');
+        showLoader();
+        setLoaderProgress(30);
         if (user) {
             hBtn.style.display = 'block';
+            setLoaderProgress(60);
             const docSnap = await getDoc(doc(db, "users", user.uid));
             if (docSnap.exists()) {
                 currentUserData = docSnap.data();
                 showMain();
             }
-            hideLoader();
+            setLoaderProgress(90);
+            setTimeout(hideLoader, 800);
         } else {
             hBtn.style.display = 'none';
             document.getElementById('loginPage').classList.remove('hidden');
@@ -356,7 +395,6 @@
         checkDayReset();
         refresh();
         loadPrayersUI();
-        loadAzkarCategories();
     };
 
     window.refresh = () => {
@@ -436,13 +474,12 @@
     window.openQuranIndex = async () => {
         openSubPage('quranIndexPage');
         if (allSurahs.length > 0) { renderSurahList(allSurahs); return; }
-        showLoader();
         try {
             const res = await fetch('https://api.alquran.cloud/v1/surah');
             const data = await res.json();
             allSurahs = data.data;
             renderSurahList(allSurahs);
-        } catch(e) { alert("تعذر جلب الفهرس"); } finally { hideLoader(); }
+        } catch(e) { alert("تعذر جلب الفهرس"); }
     };
 
     window.renderSurahList = (data) => {
@@ -455,7 +492,6 @@
     };
 
     window.loadSurah = async (num) => {
-        showLoader();
         openSubPage('surahContentPage');
         try {
             const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/quran-uthmani`);
@@ -489,7 +525,20 @@
                     ${num>1?`<button class="btn-nav" onclick="loadSurah(${num-1})">السابقة</button>`:''}
                 </div>`;
             document.getElementById('finishSurahBtn').onclick = () => { logAction('quran', 20); alert("تم إضافة 20 نقطة"); };
-        } catch(e) { alert("خطأ في التحميل"); } finally { hideLoader(); }
+        } catch(e) { alert("خطأ في التحميل"); }
+    };
+
+    window.openMisbaha = () => openSubPage('misbahaPage');
+    window.countMisbaha = () => {
+        misbahaCount++;
+        document.getElementById('misbahaCounter').innerText = misbahaCount;
+        if (window.navigator.vibrate) window.navigator.vibrate(50);
+    };
+    window.resetMisbaha = () => {
+        if(confirm("هل تريد تصفير العداد؟")) {
+            misbahaCount = 0;
+            document.getElementById('misbahaCounter').innerText = 0;
+        }
     };
 
     window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('active');
@@ -510,50 +559,9 @@
             </div>`).join('');
     };
 
-    window.loadAzkarCategories = () => {
-        document.getElementById('categoriesGrid').innerHTML = Object.keys(azkarData).map(c => `
-            <button class="btn-action" style="padding:25px; text-align:right;" onclick="loadAzkar('${c}')">
-                <i class="fas ${azkarData[c].icon}"></i> أذكار ${c}
-            </button>`).join('');
-    };
-
-    window.loadAzkar = (cat) => {
-        document.getElementById('categoriesGrid').style.display = 'none';
-        const cont = document.getElementById('tasbeehContent');
-        cont.innerHTML = `<h3 style="color:var(--gold)">أذكار ${cat}</h3><p style="font-size:0.8rem; margin-bottom:15px;">أكمل المجموعة للحصول على 10 نقاط</p>` + azkarData[cat].data.map((z,i) => `
-            <div class="zekr-box" id="z-${i}" onclick="tasbeeh('${cat}',${i})">
-                <div class="zekr-count" id="c-${i}">${z.c}</div>
-                <div>${z.t}</div>
-            </div>`).join('') + `<button class="btn-action" style="width:100%; margin-top:20px;" onclick="resetAzkarView()">عودة</button>`;
-    };
-
-    window.tasbeeh = async (cat, i) => {
-        const el = document.getElementById(`c-${i}`);
-        let c = parseInt(el.innerText);
-        if(c > 1) { el.innerText = c - 1; }
-        else if(el.innerText !== "✓") {
-            el.innerText = "✓";
-            document.getElementById(`z-${i}`).classList.add('completed');
-            
-            const allDone = Array.from(document.querySelectorAll('.zekr-count')).every(box => box.innerText === "✓");
-            if(allDone) {
-                const zekrKey = `zekr_${cat}_${new Date().toDateString()}`;
-                if(!currentUserData.dailyTasks[zekrKey]) {
-                    showLoader();
-                    await updateDoc(doc(db, "users", auth.currentUser.uid), { [`dailyTasks.${zekrKey}`]: true });
-                    currentUserData.dailyTasks[zekrKey] = true;
-                    await logAction('azkar', 10);
-                    hideLoader();
-                    alert("أحسنت! حصلت على 10 نقاط لإتمام المجموعة");
-                }
-            }
-        }
-    };
-
-    window.resetAzkarView = () => { document.getElementById('categoriesGrid').style.display = 'grid'; document.getElementById('tasbeehContent').innerHTML = ""; };
-
     window.openHadith = () => {
-        document.getElementById('hadithDisplay').innerText = hadiths[new Date().getDate() % hadiths.length];
+        const dayIndex = Math.floor(Date.now() / 86400000);
+        document.getElementById('hadithDisplay').innerText = hadiths[dayIndex % hadiths.length];
         const btn = document.getElementById('hadithRewardBtn');
         if(currentUserData.dailyTasks.hadith) {
             btn.innerText = "تمت القراءة مسبقاً"; btn.disabled = true;
@@ -571,13 +579,12 @@
             <div class="stat-card"><h4>التزام</h4><p>${currentUserData.strk} يوم</p></div>
             <div class="stat-card"><h4>الصلوات</h4><p>${h.prayers}</p></div>
             <div class="stat-card"><h4>التراويح</h4><p>${h.taraweeh || 0}</p></div>
-            <div class="stat-card"><h4>الأذكار</h4><p>${h.azkar}</p></div>
-            <div class="stat-card"><h4>القرآن</h4><p>${h.quran}</p></div>`;
+            <div class="stat-card"><h4>القرآن</h4><p>${h.quran}</p></div>
+            <div class="stat-card"><h4>الأحاديث</h4><p>${h.hadith || 0}</p></div>`;
         openSubPage('statsPage');
     };
 
     window.openLeaderboard = async () => {
-        showLoader();
         openSubPage('leaderboardPage');
         try {
             const q = query(collection(db, "users"), orderBy("pts", "desc"));
@@ -606,16 +613,15 @@
             document.getElementById('leaderTable').innerHTML = html + `</table>`;
         } catch(e) {
             alert("فشل تحميل لوحة الصدارة");
-        } finally { hideLoader(); }
+        }
     };
 
     window.resetAll = async () => {
         if(confirm("هل أنت متأكد من تصفير إنجازاتك بالكامل؟")) {
-            showLoader();
-            const resetData = { pts: 0, strk: 0, dailyTasks: {}, history: {prayers:0, azkar:0, quran:0, taraweeh:0, hadith:0} };
+            const resetData = { pts: 0, strk: 0, dailyTasks: {}, history: {prayers:0, quran:0, taraweeh:0, hadith:0} };
             await updateDoc(doc(db, "users", auth.currentUser.uid), resetData);
             currentUserData = {...currentUserData, ...resetData};
-            refresh(); loadPrayersUI(); hideLoader();
+            refresh(); loadPrayersUI();
             alert("تم التصفير بنجاح");
         }
     };
